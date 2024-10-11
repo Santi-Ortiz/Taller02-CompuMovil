@@ -385,6 +385,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun obtenerDireccionYAgregarMarcador(latLng: LatLng) {
+        val geocoder = Geocoder(this, Locale.getDefault())
+
+        val geocodeListener = object : Geocoder.GeocodeListener {
+            override fun onGeocode(addresses: MutableList<Address>) {
+                if (addresses.isNotEmpty()) {
+                    val address: Address = addresses[0]
+                    val addressText = address.getAddressLine(0) ?: "Dirección no disponible"
+
+                    runOnUiThread {
+                        if (mMap != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                            mMap.addMarker(MarkerOptions().position(latLng).title(addressText))
+                        } else {
+                            Toast.makeText(
+                                this@MapsActivity,
+                                "Mapa no está inicializado",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        Toast.makeText(this@MapsActivity, "Marcador agregado: $addressText", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@MapsActivity, "No se encontró ninguna dirección.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onError(errorMessage: String?) {
+                runOnUiThread {
+                    Toast.makeText(this@MapsActivity, "Error: $errorMessage", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1, geocodeListener)
+    }
 
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -396,6 +435,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.retro_style))
 
         requestLocationPermission()
+
+        mMap.setOnMapLongClickListener { latLng ->
+            obtenerDireccionYAgregarMarcador(latLng)
+        }
     }
 
     private fun requestLocationPermission() {
