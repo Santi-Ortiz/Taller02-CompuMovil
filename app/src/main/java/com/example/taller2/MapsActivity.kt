@@ -311,7 +311,12 @@
 
 package com.example.taller2
 
+import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -327,6 +332,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import org.json.JSONArray
@@ -347,6 +353,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var lastLocation: Location? = null
     private var currentMarker: Marker? = null
 
+    private lateinit var sensorManager: SensorManager
+    private lateinit var lightSensor: Sensor
+    private lateinit var lightSensorListener: SensorEventListener
+
     companion object {
         const val REQUEST_CODE_LOCATION = 0
         const val DISTANCE_THRESHOLD = 30f
@@ -354,9 +364,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)!!
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -373,10 +385,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
+
+        lightSensorListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                if (mMap != null) {
+                    if (event.values[0] < 5000){
+                        Log.i("MAPS", "DARK MAP " + event.values[0])
+                        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.night_style))
+                    } else {
+                        Log.i("MAPS", "LIGHT MAP " + event.values[0])
+                        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.retro_style))
+                    }
+                }
+            }
+            override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+        }
     }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isZoomGesturesEnabled = true
+        mMap.uiSettings.isCompassEnabled = true
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.retro_style))
 
         requestLocationPermission()
     }
@@ -534,5 +567,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onPause() {
         super.onPause()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        sensorManager.unregisterListener(lightSensorListener)
+    }
+    override fun onResume() {
+        super.onResume()
+        sensorManager.registerListener(lightSensorListener, lightSensor,
+            SensorManager.SENSOR_DELAY_NORMAL)
     }
 }
