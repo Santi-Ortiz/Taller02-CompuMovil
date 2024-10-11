@@ -330,17 +330,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             val position = LatLng(addressResult.latitude, addressResult.longitude)
 
                             runOnUiThread {
-                                Toast.makeText(
-                                    this@MapsActivity,
-                                    "Location: ${position.latitude}, ${position.longitude}",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                Log.i("success marcador", "MARCADOR AGREGADO EN ${position.longitude} ${position.latitude}")
 
                                 if (mMap != null) {
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
                                     mMap.addMarker(
-                                        MarkerOptions().position(position).title("Lo que buscaste")
+                                        MarkerOptions().position(position).title("Marcador en LONG:${position.longitude} LAT:${position.latitude}")
                                     )
+                                    distanceToMark(position)
                                 } else {
                                     Toast.makeText(
                                         this@MapsActivity,
@@ -399,6 +396,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         if (mMap != null) {
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
                             mMap.addMarker(MarkerOptions().position(latLng).title(addressText))
+                            distanceToMark(latLng)
                         } else {
                             Toast.makeText(
                                 this@MapsActivity,
@@ -406,7 +404,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        Toast.makeText(this@MapsActivity, "Marcador agregado: $addressText", Toast.LENGTH_LONG).show()
+                        Log.i("success marcador", "MARCADOR AGREGADO EN ${addressText}")
                     }
                 } else {
                     runOnUiThread {
@@ -423,6 +421,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1, geocodeListener)
+    }
+
+    private fun distanceToMark(latLng: LatLng) {
+        if (lastLocation != null) {
+            val markerLocation = Location("").apply {
+                latitude = latLng.latitude
+                longitude = latLng.longitude
+            }
+
+            val distance = lastLocation!!.distanceTo(markerLocation)
+
+            Toast.makeText(this, "Distancia al marcador (linea recta): $distance metros", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "No se ha obtenido la ubicación actual", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
