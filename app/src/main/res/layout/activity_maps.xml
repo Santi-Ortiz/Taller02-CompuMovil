@@ -27,6 +27,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/roundcorner"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:imeOptions="actionSend"
+        />
 
 </FrameLayout>

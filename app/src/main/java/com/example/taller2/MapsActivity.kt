@@ -1,135 +1,3 @@
-//package com.example.taller2
-//
-//import android.content.pm.PackageManager
-//import android.location.Location
-//import android.os.Bundle
-//import android.widget.Toast
-//import androidx.appcompat.app.AppCompatActivity
-//import androidx.core.app.ActivityCompat
-//import androidx.core.content.ContextCompat
-//import com.example.taller2.databinding.ActivityMapsBinding
-//import com.google.android.gms.location.FusedLocationProviderClient
-//import com.google.android.gms.location.LocationServices
-//import com.google.android.gms.maps.CameraUpdateFactory
-//import com.google.android.gms.maps.GoogleMap
-//import com.google.android.gms.maps.OnMapReadyCallback
-//import com.google.android.gms.maps.SupportMapFragment
-//import com.google.android.gms.maps.model.LatLng
-//import com.google.android.gms.maps.model.MarkerOptions
-//
-//class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-//
-//    private lateinit var mMap: GoogleMap
-//    private lateinit var binding: ActivityMapsBinding
-//    private lateinit var fusedLocationClient: FusedLocationProviderClient
-//
-//    companion object {
-//        const val REQUEST_CODE_LOCATION = 0
-//    }
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        binding = ActivityMapsBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        val mapFragment = supportFragmentManager
-//            .findFragmentById(R.id.map) as SupportMapFragment
-//        mapFragment.getMapAsync(this)
-//
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-//    }
-//
-//    override fun onMapReady(googleMap: GoogleMap) {
-//        mMap = googleMap
-//
-//        requestLocationPermission()
-//    }
-//
-//    private fun requestLocationPermission() {
-//        if (!::mMap.isInitialized) return
-//
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            mMap.isMyLocationEnabled = true
-//            getCurrentLocation()  // Obtener la ubicación actual si ya se tienen los permisos
-//        } else {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(
-//                    this,
-//                    android.Manifest.permission.ACCESS_FINE_LOCATION
-//                )
-//            ) {
-//                Toast.makeText(this, "Ve a ajustes y acepta los permisos", Toast.LENGTH_SHORT)
-//                    .show()
-//            } else {
-//                ActivityCompat.requestPermissions(
-//                    this,
-//                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-//                    REQUEST_CODE_LOCATION
-//                )
-//            }
-//        }
-//    }
-//
-//    private fun getCurrentLocation() {
-//        if (ActivityCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            return
-//        }
-//
-//        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-//            if (location != null) {
-//                val currentLatLng = LatLng(location.latitude, location.longitude)
-//
-//                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
-//
-//                mMap.addMarker(
-//                    MarkerOptions().position(currentLatLng).title("Ubicación Actual")
-//                )
-//            } else {
-//                Toast.makeText(this, "No se pudo obtener la ubicación actual", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        when (requestCode) {
-//            REQUEST_CODE_LOCATION -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                mMap.isMyLocationEnabled = true
-//                getCurrentLocation()
-//            } else {
-//                Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
-//    override fun onResumeFragments() {
-//        super.onResumeFragments()
-//        if (!::mMap.isInitialized) return
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            mMap.isMyLocationEnabled = false
-//            Toast.makeText(this, "Ve a ajustes y acepta los permisos", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//}
 
 //package com.example.taller2
 //
@@ -317,11 +185,16 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -337,10 +210,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
-import java.io.Writer
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -400,7 +271,120 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
         }
+
+        binding.editTextMaps.setOnEditorActionListener { textView, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEND) {
+                val address = binding.editTextMaps.text.toString()
+                if (address.isNotEmpty()) {
+                    buscarDireccion(address)
+                } else {
+                    Toast.makeText(this, "Ingrese una dirección", Toast.LENGTH_SHORT).show()
+                }
+                true
+            } else {
+                false
+            }
+        }
     }
+
+//    private fun buscarDireccion (direccion: String) {
+//        val mGeocoder = Geocoder(baseContext)
+//        val geocodeListener = @RequiresApi(33) object : Geocoder.GeocodeListener {
+//            override fun onGeocode(addresses: MutableList<Address>) {
+//                // do something with the addresses list
+//            }
+//        }
+//        if(direccion.isNotEmpty()) {
+//            try {
+//                val addresses = mGeocoder.getFromLocationName(direccion, 2, geocodeListener)
+//                if (addresses != null && addresses.isNotEmpty()) {
+//                    val addressResult = addresses[0]
+//                    val position = LatLng(addressResult.latitude, addressResult.longitude)
+//                    if (mMap != null) {
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
+//
+//                        mMap.addMarker(
+//                            MarkerOptions().position(position).title("Lo que buscaste")
+//                        )
+//                    } else {
+//                        Toast.makeText(this, "Dirección no encontrada", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            } catch (e: IOException) {
+//                e.printStackTrace()
+//            }
+//        } else {
+//            Toast.makeText(this, "La dirección esta vacía", Toast.LENGTH_SHORT).show()
+//        }
+//    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun buscarDireccion(direccion: String) {
+        val mGeocoder = Geocoder(baseContext, Locale.getDefault())
+        if (direccion.isNotEmpty()) {
+            try {
+                val geocodeListener = object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) {
+                        if (addresses.isNotEmpty()) {
+                            val addressResult = addresses[0]
+                            val position = LatLng(addressResult.latitude, addressResult.longitude)
+
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@MapsActivity,
+                                    "Location: ${position.latitude}, ${position.longitude}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                if (mMap != null) {
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
+                                    mMap.addMarker(
+                                        MarkerOptions().position(position).title("Lo que buscaste")
+                                    )
+                                } else {
+                                    Toast.makeText(
+                                        this@MapsActivity,
+                                        "Mapa no está inicializado",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        } else {
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@MapsActivity,
+                                    "Dirección no encontrada",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+
+                    override fun onError(errorMessage: String?) {
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@MapsActivity,
+                                "Error: $errorMessage",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+
+                mGeocoder.getFromLocationName(direccion, 1, geocodeListener)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            runOnUiThread {
+                Toast.makeText(this, "La dirección está vacía", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
 
     override fun onMapReady(googleMap: GoogleMap) {
