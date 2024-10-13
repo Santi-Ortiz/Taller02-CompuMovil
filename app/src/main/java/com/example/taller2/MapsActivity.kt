@@ -363,7 +363,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         runOnUiThread {
                             Toast.makeText(
                                 this@MapsActivity,
-                                "Error: $errorMessage",
+                                "Ubicación difícil de geocodificar.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
