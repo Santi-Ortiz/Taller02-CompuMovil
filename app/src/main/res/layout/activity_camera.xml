@@ -12,9 +12,11 @@
     <ImageView
         android:id="@+id/imageButtonCamera"
         android:layout_width="920dp"
-        android:layout_height="380dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
         android:backgroundTint="@android:color/transparent"
         android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
         android:layout_marginTop="180dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
