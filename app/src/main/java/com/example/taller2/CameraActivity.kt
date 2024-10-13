@@ -107,14 +107,18 @@ class CameraActivity : AppCompatActivity() {
     }
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            if (imageUri != null) {
-                binding.imageButtonCamera.setImageURI(imageUri)
-                saveImageToGallery(imageUri!!)
+            imageUri?.let { uri ->
+                Glide.with(this)
+                    .load(uri)
+                    .override(500, 500)
+                    .into(binding.imageButtonCamera)
+                saveImageToGallery(uri)
             }
         } else {
             Toast.makeText(this, "No se capturó ninguna imagen", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun captureImageFromCamera() {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.TITLE, "New Picture")
@@ -133,16 +137,20 @@ class CameraActivity : AppCompatActivity() {
 
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_IMAGE_CAPTURE -> {
+                /*REQUEST_IMAGE_CAPTURE -> {
                     if (data != null) {
                         imageUri = data.data
                         imageButtonCamera.setImageURI(imageUri)
                     }
-                }
+                }*/
                 REQUEST_IMAGE_GALLERY -> {
                     val selectedImageUri = data?.data
-                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
-                    imageButtonCamera.setImageBitmap(getResizedBitmap(bitmap))
+                    selectedImageUri?.let {
+                        Glide.with(this)
+                            .load(it)
+                            .override(500, 500)
+                            .into(binding.imageButtonCamera)
+                    }
                 }
             }
         }
