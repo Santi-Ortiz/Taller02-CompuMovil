@@ -15,30 +15,33 @@
         android:layout_height="200dp"
         app:srcCompat="@drawable/contacts"
         android:scaleType="centerInside"
-        android:layout_marginTop="30dp"
+        android:backgroundTint="@android:color/transparent"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageButton
         android:id="@+id/imageButtonCamera"
+        android:backgroundTint="@android:color/transparent"
         android:layout_width="320dp"
         android:layout_height="200dp"
         android:scaleType="centerInside"
         app:layout_constraintTop_toBottomOf="@+id/imageButtonContacts"
         app:srcCompat="@drawable/camera"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="60dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
     />
     <ImageButton
         android:id="@+id/imageButtonMaps"
+        android:backgroundTint="@android:color/transparent"
         android:layout_width="320dp"
         android:layout_height="200dp"
         android:scaleType="centerInside"
         app:layout_constraintTop_toBottomOf="@+id/imageButtonCamera"
         app:srcCompat="@drawable/osmap"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="60dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

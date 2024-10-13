@@ -179,6 +179,7 @@
 
 package com.example.taller2
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -233,6 +234,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         const val DISTANCE_THRESHOLD = 30f
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMapsBinding.inflate(layoutInflater)
@@ -415,7 +417,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             override fun onError(errorMessage: String?) {
                 runOnUiThread {
-                    Toast.makeText(this@MapsActivity, "Error: $errorMessage", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity, "Ubicación difícil de geocodificar.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -439,6 +441,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -534,7 +537,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val fileName = "locations.json"
         val file = File(filesDir, fileName)
-        Log.i("LOCATION", "Ubicacion: ${file}")
+        Log.i("LOCATION", "Ubicación: ${file}")
 
         val jsonArray: JSONArray = if (file.exists()) {
             val content = file.readText()
@@ -545,7 +548,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         jsonArray.put(latLng)
 
-        file.writeText(jsonArray.toString())
+        file.writeText(jsonArray.toString(4))
 
         Log.d("MapsActivity", "Ubicación guardada: $latLng")
         Toast.makeText(this, "Ubicacion guardada", Toast.LENGTH_SHORT).show()
@@ -583,6 +586,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_CODE_LOCATION -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestLocationPermission()
+                    return
+                }
                 mMap.isMyLocationEnabled = true
                 startLocationUpdates()
             } else {
