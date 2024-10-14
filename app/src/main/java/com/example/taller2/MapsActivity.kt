@@ -1,182 +1,3 @@
-
-//package com.example.taller2
-//
-//import android.content.pm.PackageManager
-//import android.location.Location
-//import android.os.Bundle
-//import android.util.Log
-//import android.widget.Toast
-//import androidx.appcompat.app.AppCompatActivity
-//import androidx.core.app.ActivityCompat
-//import androidx.core.content.ContextCompat
-//import com.example.taller2.databinding.ActivityMapsBinding
-//import com.google.android.gms.location.FusedLocationProviderClient
-//import com.google.android.gms.location.LocationServices
-//import com.google.android.gms.maps.CameraUpdateFactory
-//import com.google.android.gms.maps.GoogleMap
-//import com.google.android.gms.maps.OnMapReadyCallback
-//import com.google.android.gms.maps.SupportMapFragment
-//import com.google.android.gms.maps.model.LatLng
-//import com.google.android.gms.maps.model.MarkerOptions
-//import org.json.JSONArray
-//import org.json.JSONObject
-//import java.io.File
-//import java.io.FileOutputStream
-//import java.io.OutputStreamWriter
-//import java.text.SimpleDateFormat
-//import java.util.*
-//
-//class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-//
-//    private lateinit var mMap: GoogleMap
-//    private lateinit var binding: ActivityMapsBinding
-//    private lateinit var fusedLocationClient: FusedLocationProviderClient
-//    private var lastLocation: Location? = null
-//
-//    companion object {
-//        const val REQUEST_CODE_LOCATION = 0
-//        const val DISTANCE_THRESHOLD = 30f
-//    }
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        binding = ActivityMapsBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        val mapFragment = supportFragmentManager
-//            .findFragmentById(R.id.map) as SupportMapFragment
-//        mapFragment.getMapAsync(this)
-//
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-//    }
-//
-//    override fun onMapReady(googleMap: GoogleMap) {
-//        mMap = googleMap
-//
-//        requestLocationPermission()
-//    }
-//
-//    private fun requestLocationPermission() {
-//        if (!::mMap.isInitialized) return
-//
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            mMap.isMyLocationEnabled = true
-//            getCurrentLocation()
-//        } else {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(
-//                    this,
-//                    android.Manifest.permission.ACCESS_FINE_LOCATION
-//                )
-//            ) {
-//                Toast.makeText(this, "Ve a ajustes y acepta los permisos", Toast.LENGTH_SHORT)
-//                    .show()
-//            } else {
-//                ActivityCompat.requestPermissions(
-//                    this,
-//                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-//                    REQUEST_CODE_LOCATION
-//                )
-//            }
-//        }
-//    }
-//
-//    private fun getCurrentLocation() {
-//        if (ActivityCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            return
-//        }
-//
-//        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-//            if (location != null) {
-//                if (lastLocation == null || location.distanceTo(lastLocation!!) > DISTANCE_THRESHOLD) {
-//                    lastLocation = location
-//                    val currentLatLng = LatLng(location.latitude, location.longitude)
-//
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
-//
-//                    mMap.clear()
-//                    mMap.addMarker(
-//                        MarkerOptions().position(currentLatLng).title("Ubicación Actual")
-//                    )
-//
-//                    //saveLocationToJSON(location)
-//
-//                }
-//            } else {
-//                Toast.makeText(this, "No se pudo obtener la ubicación actual", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
-//    private fun saveLocationToJSON(location: Location) {
-//        val latLng = JSONObject().apply {
-//            put("latitude", location.latitude)
-//            put("longitude", location.longitude)
-//            put("timestamp", getCurrentTimestamp())
-//        }
-//
-//        val file = File(filesDir, "locations.json")
-//
-//        val jsonArray: JSONArray = if (file.exists()) {
-//            val content = file.readText()
-//            JSONArray(content)
-//        } else {
-//            JSONArray()
-//        }
-//
-//        jsonArray.put(latLng)
-//
-//        file.writeText(jsonArray.toString())
-//
-//        Log.d("MapsActivity", "Ubicación guardada: $latLng")
-//    }
-//
-//    private fun getCurrentTimestamp(): String {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-//        return sdf.format(Date())
-//    }
-//
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        when (requestCode) {
-//            REQUEST_CODE_LOCATION -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                mMap.isMyLocationEnabled = true
-//                getCurrentLocation()
-//            } else {
-//                Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
-//    override fun onResumeFragments() {
-//        super.onResumeFragments()
-//        if (!::mMap.isInitialized) return
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            mMap.isMyLocationEnabled = false
-//            Toast.makeText(this, "Ve a ajustes y acepta los permisos", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//}
-
 package com.example.taller2
 
 import android.Manifest
@@ -209,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -223,6 +45,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private var lastLocation: Location? = null
+    private var currentLocation: Location? = null
     private var currentMarker: Marker? = null
 
     private lateinit var sensorManager: SensorManager
@@ -231,7 +54,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         const val REQUEST_CODE_LOCATION = 0
-        const val DISTANCE_THRESHOLD = 30f
+        const val DISTANCE_THRESHOLD = 15f
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -288,37 +111,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-
-//    private fun buscarDireccion (direccion: String) {
-//        val mGeocoder = Geocoder(baseContext)
-//        val geocodeListener = @RequiresApi(33) object : Geocoder.GeocodeListener {
-//            override fun onGeocode(addresses: MutableList<Address>) {
-//                // do something with the addresses list
-//            }
-//        }
-//        if(direccion.isNotEmpty()) {
-//            try {
-//                val addresses = mGeocoder.getFromLocationName(direccion, 2, geocodeListener)
-//                if (addresses != null && addresses.isNotEmpty()) {
-//                    val addressResult = addresses[0]
-//                    val position = LatLng(addressResult.latitude, addressResult.longitude)
-//                    if (mMap != null) {
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
-//
-//                        mMap.addMarker(
-//                            MarkerOptions().position(position).title("Lo que buscaste")
-//                        )
-//                    } else {
-//                        Toast.makeText(this, "Dirección no encontrada", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            } catch (e: IOException) {
-//                e.printStackTrace()
-//            }
-//        } else {
-//            Toast.makeText(this, "La dirección esta vacía", Toast.LENGTH_SHORT).show()
-//        }
-//    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun buscarDireccion(direccion: String) {
@@ -455,6 +247,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setOnMapLongClickListener { latLng ->
             obtenerDireccionYAgregarMarcador(latLng)
         }
+
+        getLastLocation()
+    }
+
+    private fun getLastLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                currentLocation = location
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                mMap.addMarker(MarkerOptions().position(currentLatLng).title("Ubicación Actual"))
+            } else {
+                startLocationUpdates()
+            }
+        }
     }
 
     private fun requestLocationPermission() {
@@ -494,10 +312,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (ActivityCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             return
@@ -517,9 +332,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
 
-            if (currentMarker != null) {
-                currentMarker?.remove()
-            }
+            currentMarker?.remove()
             currentMarker = mMap.addMarker(
                 MarkerOptions().position(currentLatLng).title("Ubicación Actual")
             )

@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    implementation(libs.places)
     testImplementation(libs.junit)
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
