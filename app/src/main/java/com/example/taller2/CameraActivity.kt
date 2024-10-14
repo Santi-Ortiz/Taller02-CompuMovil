@@ -38,6 +38,11 @@ class CameraActivity : AppCompatActivity() {
 
         imageButtonCamera = binding.imageButtonCamera
 
+        binding.buttonGallery.isEnabled = false
+
+        // Deshabilitar el botón de la cámara
+        binding.buttonCamera.isEnabled = false
+
         binding.buttonGallery.setOnClickListener {
             openGallery()
         }
@@ -66,8 +71,14 @@ class CameraActivity : AppCompatActivity() {
                 arrayOf(
                     Manifest.permission.CAMERA,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ),0)
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),0)
+            binding.buttonGallery.isEnabled = true
+
+            // Deshabilitar el botón de la cámara
+            binding.buttonCamera.isEnabled = true
+        } else {
+            Toast.makeText(this, "Permisos no concedidos", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -133,7 +144,7 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode,
-        data)
+            data)
 
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
